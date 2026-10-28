@@ -60,10 +60,12 @@ pipeline {
 
             # 1. 인증: username/password로 config.json 생성 (buildkit은 DOCKER_CONFIG의 config.json으로 레지스트리 인증)
             mkdir -p ~/.docker
+            set +x
             AUTH=$(printf '%s:%s' "${REG_USER}" "${REG_PASS}" | base64 | tr -d '\n')
             cat > ~/.docker/config.json << EOF
 {"auths":{"${IMAGE_REGISTRY_URL}":{"auth":"${AUTH}"}}}
 EOF
+            set -x
 
             # 2. 빌드 + 푸시 (buildctl-daemonless.sh: rootless buildkitd를 즉석에서 띄워 한 번에 수행)
             # overlayfs 스냅샷터는 현재 파일시스템에서 trusted.overlay xattr을 지원하지 않아
